@@ -9,16 +9,16 @@ router.post('/', async (request, response) => {
         if (
             !request.body.title ||
             !request.body.author ||
-            !request.body.publisYear
+            !request.body.publishYear
         ) {
             return response.status(400).send({
-                message: 'Send all requred fields: title, authot, publisYear',
+                message: 'Send all required fields: title, author, publishYear',
             });
         }
         const newBook = {
             title: request.body.title,
             author: request.body.author,
-            publisYear: request.body.publisYear,
+            publishYear: request.body.publishYear,
         };
 
         const book = await Book.create(newBook);
@@ -30,10 +30,12 @@ router.post('/', async (request, response) => {
     }
 });
 
+
 // Route for Get All Book from database
 router.get('/', async (request, response) => {
     try {
         const books = await Book.find({});
+        console.log('Books:', books);
 
         return response.status(200).json(books);
     } catch (error) {
@@ -47,8 +49,8 @@ router.put('/:id', async (request, response) => {
     try {
         if (
             !request.body.title ||
-            !request.body.authot ||
-            !request.body.publisYear
+            !request.body.author ||
+            !request.body.publishYear
         ) {
             return response.status(400).send({
                 message: 'Send all requirement fields: title, author, publishYear',
@@ -65,7 +67,7 @@ router.put('/:id', async (request, response) => {
 
         return response.status(200).send({ message: 'Book updated successfully' });
     } catch (error) {
-        console.lof(error.message);
+        console.log(error.message);
         response.status(500).send({ message: error.message });
     }
 });
