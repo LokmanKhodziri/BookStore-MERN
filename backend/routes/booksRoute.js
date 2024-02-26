@@ -1,9 +1,10 @@
 import express from 'express';
 import { Book } from "../models/bookModel.js";
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
-//Route for save new book
+// Route for save new book
 router.post('/', async (request, response) => {
     try {
         if (
@@ -30,19 +31,40 @@ router.post('/', async (request, response) => {
     }
 });
 
-
-// Route for Get All Book from database
-router.get('/', async (request, response) => {
+// Route for Get All Books from database
+router.get('/', async (req, res) => {
     try {
-        const books = await Book.find({});
-        console.log('Books:', books);
-
-        return response.status(200).json(books);
+        const books = await Book.find();
+        res.status(200).json({ data: books });
     } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
+        console.error('Error fetching all books:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Route for Get a specific book by ID
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    console.log('Received ID:', id); // Add this line
+    try {
+        // Validate if the received ID is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid ObjectId format' });
+        }
+
+        const objectId = new mongoose.Types.ObjectId(id);
+        const book = await Book.findById(objectId);
+        console.log('Book:', book); // Add this line
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+        res.status(200).json({ data: book });
+    } catch (error) {
+        console.error('Error fetching book details:', error);
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
+});
+
 
 // Route for Update a book
 router.put('/:id', async (request, response) => {
@@ -91,4 +113,4 @@ router.delete('/:id', async (request, response) => {
     }
 });
 
-export default router
+export default router;

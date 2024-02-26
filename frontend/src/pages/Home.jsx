@@ -9,21 +9,24 @@ import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md'
 const Home = () => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         setLoading(true);
+        const apiUrl = 'http://localhost:5050/books';
         axios
-            .get('http://localhost:5050/books')
+            .get(apiUrl)
             .then((response) => {
-                console.log(response.data.data);
+                console.log('Response:', response.data.data);
                 setBooks(response.data.data);
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
+                console.log('Error:', error);
                 setLoading(false);
             });
     }, []);
+
 
     console.log(books);
 
@@ -32,11 +35,13 @@ const Home = () => {
             <div className='flex justify-between item-center'>
                 <h1 className='text-3xl my-8'>Books List</h1>
                 <Link to='/books/create'>
-                    < MdOutlineAddBox className='blue text-sky-800 text-4xl' />
+                    <MdOutlineAddBox className='blue text-sky-800 text-4xl' />
                 </Link>
             </div>
             {loading ? (
-                < Spinner />
+                <Spinner />
+            ) : error ? (
+                <div className="text-red-600">Error loading data. Please try again later.</div>
             ) : (
                 <table className='w-full border-sperate border-spacing-2'>
                     <thead>
