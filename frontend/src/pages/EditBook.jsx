@@ -3,6 +3,7 @@ import BackButton from '../components/BackButton';
 import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 const EditBooks = () => {
     const [title, setTitle] = useState('');
@@ -11,6 +12,7 @@ const EditBooks = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         setLoading(true);
@@ -25,7 +27,10 @@ const EditBooks = () => {
                     setPublishYear(data.data.publishYear);
                 } else {
                     console.error('Invalid response format for book details:', data);
-                    alert('The requested book was not found.');
+                    enqueueSnackbar('The requested book was not found.', {
+                        variant:
+                            'success'
+                    });
                     // Redirect to home page or previous page
                     navigate('/');
                 }
@@ -36,12 +41,10 @@ const EditBooks = () => {
                 setLoading(false);
 
                 if (error.response && error.response.status === 404) {
-                    // Handle 404 error: Book not found
-                    alert('The requested book was not found.');
-                    // Redirect to home page or previous page
+                    enqueueSnackbar('error', { variant: 'error' });
                     navigate('/');
                 } else {
-                    alert('An error happened. Please check console.');
+                    enqueueSnackbar('Error', { variant: 'error' });
                     console.error(error);
                 }
             });
@@ -62,6 +65,7 @@ const EditBooks = () => {
             .then(() => {
                 setLoading(false);
                 navigate('/');
+                enqueueSnackbar('Book edited successfully', { variant: 'success' });
             })
             .catch((error) => {
                 setLoading(false);
@@ -74,8 +78,10 @@ const EditBooks = () => {
                 } else {
                     console.error('Error setting up the request:', error.message);
                 }
-            })
+                enqueueSnackbar('Error editing the book', { variant: 'error' });
+            });
     };
+
 
     return (
         <div className='p-4'>
